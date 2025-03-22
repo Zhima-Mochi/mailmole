@@ -34,14 +34,14 @@ import (
 
 func main() {
     // Create a tunnel agent with options
-    options := mailmole.TunnelOptions{
+    options := &mailmole.TunnelOptions{
         BrowserOptions: &mailmole.BrowserOptions{
             Headless: false,
         },
     }
 
     // Create a SmailPro tunnel agent
-    agent, err := mailmole.CreateTunnel(mailmole.SmailPro, options)
+    agent, err := mailmole.CreateTunnel(mailmole.SmailProTunnel, options)
     if err != nil {
         log.Fatalf("Failed to create tunnel agent: %v", err)
     }

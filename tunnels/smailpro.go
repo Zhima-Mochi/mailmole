@@ -15,11 +15,15 @@ type SmailProTunnel struct {
 	page          *rod.Page
 	browser       *rod.Browser
 	codeSelector  string
-	tunnelOptions types.TunnelOptions
+	tunnelOptions *types.TunnelOptions
 }
 
 // NewSmailProTunnel creates a new SmailProTunnel
-func NewSmailProTunnel(options types.TunnelOptions) types.TunnelAgent {
+func NewSmailProTunnel(options *types.TunnelOptions) types.TunnelAgent {
+	if options == nil {
+		options = defaultTunnelOptions
+	}
+
 	return &SmailProTunnel{
 		// Default code extractor is the built-in one
 		codeSelector:  `\b\d{6}\b`,

@@ -15,11 +15,15 @@ type YopmailTunnel struct {
 	page          *rod.Page
 	browser       *rod.Browser
 	codeSelector  string
-	tunnelOptions types.TunnelOptions
+	tunnelOptions *types.TunnelOptions
 }
 
 // NewYopmailTunnel creates a new YopmailTunnel
-func NewYopmailTunnel(options types.TunnelOptions) types.TunnelAgent {
+func NewYopmailTunnel(options *types.TunnelOptions) types.TunnelAgent {
+	if options == nil {
+		options = defaultTunnelOptions
+	}
+
 	return &YopmailTunnel{
 		codeSelector:  `\b\d{6}\b`,
 		tunnelOptions: options,

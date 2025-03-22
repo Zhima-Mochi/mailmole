@@ -9,6 +9,14 @@ import (
 	"github.com/go-rod/rod/lib/launcher"
 )
 
+var (
+	defaultTunnelOptions = &types.TunnelOptions{
+		BrowserOptions: &types.BrowserOptions{
+			Headless: true,
+		},
+	}
+)
+
 // Custom code extractor for different email formats
 func customCodeExtractor(page *rod.Page, selector string) (string, error) {
 	if selector == "" {
