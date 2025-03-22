@@ -54,7 +54,7 @@ func getBrowser(browserOptions *types.BrowserOptions) *rod.Browser {
 	}
 
 	if browserOptions.URL == "" {
-		browserOptions.URL = "https://www.google.com"
+		browserOptions.URL = "ws://127.0.0.1:3000"
 	}
 
 	var browser *rod.Browser
