@@ -21,7 +21,7 @@ var (
 // Custom code extractor for different email formats
 func customCodeExtractor(page *rod.Page, matcher string) (string, error) {
 	if matcher == "" {
-		matcher = `\d{6}`
+		matcher = `^\d{6}$`
 	}
 
 	iframeElement, err := page.Timeout(10 * time.Second).Element("iframe")

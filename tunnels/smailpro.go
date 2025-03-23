@@ -25,8 +25,6 @@ func NewSmailProTunnel(options *types.TunnelOptions) types.TunnelAgent {
 	}
 
 	return &SmailProTunnel{
-		// Default code extractor is the built-in one
-		codeMatcher:   `\b\d{6}\b`,
 		tunnelOptions: options,
 	}
 }

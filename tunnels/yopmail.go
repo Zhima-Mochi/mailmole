@@ -25,7 +25,6 @@ func NewYopmailTunnel(options *types.TunnelOptions) types.TunnelAgent {
 	}
 
 	return &YopmailTunnel{
-		codeMatcher:   `\b\d{6}\b`,
 		tunnelOptions: options,
 	}
 }
