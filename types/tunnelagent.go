@@ -26,8 +26,8 @@ type TunnelAgent interface {
 	// (e.g., 6-digit number)
 	GetVerificationCode() (string, error)
 
-	// SetCodeSelector sets the selector for the verification code
-	SetCodeSelector(selector string)
+	// SetCodeMatcher sets the selector for the verification code
+	SetCodeMatcher(selector string)
 
 	// Close cleans up resources
 	Close() error

@@ -14,7 +14,7 @@ type SmailProTunnel struct {
 	email         string
 	page          *rod.Page
 	browser       *rod.Browser
-	codeSelector  string
+	codeMatcher   string
 	tunnelOptions *types.TunnelOptions
 }
 
@@ -26,7 +26,7 @@ func NewSmailProTunnel(options *types.TunnelOptions) types.TunnelAgent {
 
 	return &SmailProTunnel{
 		// Default code extractor is the built-in one
-		codeSelector:  `\b\d{6}\b`,
+		codeMatcher:   `\b\d{6}\b`,
 		tunnelOptions: options,
 	}
 }
@@ -79,8 +79,8 @@ func (v *SmailProTunnel) EmailAddress() string {
 }
 
 // SetCodeExtractor sets a custom function to extract verification codes
-func (v *SmailProTunnel) SetCodeSelector(selector string) {
-	v.codeSelector = selector
+func (v *SmailProTunnel) SetCodeMatcher(selector string) {
+	v.codeMatcher = selector
 }
 
 // GetVerificationCode extracts the verification code from the email
@@ -113,7 +113,7 @@ func (v *SmailProTunnel) GetVerificationCode() (string, error) {
 	time.Sleep(1 * time.Second)
 
 	// Extract verification code after clicking
-	return customCodeExtractor(v.page, v.codeSelector)
+	return customCodeExtractor(v.page, v.codeMatcher)
 }
 
 // Close cleans up resources

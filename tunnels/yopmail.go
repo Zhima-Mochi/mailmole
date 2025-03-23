@@ -14,7 +14,7 @@ type YopmailTunnel struct {
 	email         string
 	page          *rod.Page
 	browser       *rod.Browser
-	codeSelector  string
+	codeMatcher   string
 	tunnelOptions *types.TunnelOptions
 }
 
@@ -25,7 +25,7 @@ func NewYopmailTunnel(options *types.TunnelOptions) types.TunnelAgent {
 	}
 
 	return &YopmailTunnel{
-		codeSelector:  `\b\d{6}\b`,
+		codeMatcher:   `\b\d{6}\b`,
 		tunnelOptions: options,
 	}
 }
@@ -96,9 +96,9 @@ func (v *YopmailTunnel) EmailAddress() string {
 	return v.email
 }
 
-// SetCodeSelector sets the selector for the verification code
-func (v *YopmailTunnel) SetCodeSelector(selector string) {
-	v.codeSelector = selector
+// SetCodeMatcher sets the matcher for the verification code
+func (v *YopmailTunnel) SetCodeMatcher(matcher string) {
+	v.codeMatcher = matcher
 }
 
 // GetVerificationCode extracts the verification code from the email
@@ -131,8 +131,7 @@ func (v *YopmailTunnel) GetVerificationCode() (string, error) {
 	time.Sleep(1 * time.Second)
 
 	// Extract verification code after clicking
-	return customCodeExtractor(v.page, v.codeSelector)
-	return "", errors.New("no verification code found")
+	return customCodeExtractor(v.page, v.codeMatcher)
 }
 
 // Close cleans up resources

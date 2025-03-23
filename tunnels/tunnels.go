@@ -19,9 +19,9 @@ var (
 )
 
 // Custom code extractor for different email formats
-func customCodeExtractor(page *rod.Page, selector string) (string, error) {
-	if selector == "" {
-		selector = `\b\d{6}\b`
+func customCodeExtractor(page *rod.Page, matcher string) (string, error) {
+	if matcher == "" {
+		matcher = `\d{6}`
 	}
 
 	iframeElement, err := page.Timeout(10 * time.Second).Element("iframe")
@@ -39,7 +39,7 @@ func customCodeExtractor(page *rod.Page, selector string) (string, error) {
 		_ = page.Mouse.Click(proto.InputMouseButtonLeft, 1)
 	}()
 
-	codeElement, err := iframePage.ElementR("*", selector)
+	codeElement, err := iframePage.ElementR("*", matcher)
 	if err != nil {
 		return "", errors.New("failed to find verification code")
 	}
