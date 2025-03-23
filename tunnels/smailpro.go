@@ -90,7 +90,29 @@ func (v *SmailProTunnel) GetVerificationCode() (string, error) {
 		return "", err
 	}
 
-	// Extract verification code
+	// Click on the first message if found
+	found := v.page.MustEval(`() => {
+		const elements = document.querySelectorAll("div.cursor-pointer");
+		for (const el of elements) {
+			const clickAttr = el.getAttribute("@click");
+			const xClickAttr = el.getAttribute("x-on:click");
+			if (clickAttr === "message(getTemporaryEmailAddress(), mes)" || 
+				xClickAttr === "message(getTemporaryEmailAddress(), mes)") {
+				el.click();
+				return true;
+			}
+		}
+		return false;
+	}`).Bool()
+
+	if !found {
+		return "", errors.New("no message found to click")
+	}
+
+	// Wait a bit for the message to load
+	time.Sleep(1 * time.Second)
+
+	// Extract verification code after clicking
 	return customCodeExtractor(v.page, v.codeSelector)
 }
 

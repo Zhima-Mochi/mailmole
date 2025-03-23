@@ -7,6 +7,7 @@ import (
 	"github.com/Zhima-Mochi/mailmole/types"
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/launcher"
+	"github.com/go-rod/rod/lib/proto"
 )
 
 var (
@@ -32,6 +33,11 @@ func customCodeExtractor(page *rod.Page, selector string) (string, error) {
 	if err != nil {
 		return "", errors.New("failed to get iframe page")
 	}
+
+	defer func() {
+		_ = page.Mouse.MoveTo(proto.Point{X: 10, Y: 10})
+		_ = page.Mouse.Click(proto.InputMouseButtonLeft, 1)
+	}()
 
 	codeElement, err := iframePage.ElementR("*", selector)
 	if err != nil {
