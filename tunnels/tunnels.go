@@ -2,6 +2,7 @@ package tunnels
 
 import (
 	"errors"
+	"log"
 	"time"
 
 	"github.com/Zhima-Mochi/mailmole/types"
@@ -53,22 +54,20 @@ func customCodeExtractor(page *rod.Page, matcher string) (string, error) {
 }
 
 func getBrowser(browserOptions *types.BrowserOptions) *rod.Browser {
-	if browserOptions == nil {
-		browserOptions = &types.BrowserOptions{
-			Headless: true,
+	browser := rod.New()
+
+	if browserOptions.URL != "" {
+		browser.ControlURL(browserOptions.URL).MustConnect()
+
+		return browser
+	}
+
+	if !browserOptions.Headless {
+		launcher := launcher.New().Headless(false)
+		if err := browser.ControlURL(launcher.MustLaunch()).Connect(); err != nil {
+			log.Fatalf("Failed to connect to browser: %v", err)
 		}
 	}
 
-	if browserOptions.URL == "" {
-		browserOptions.URL = "ws://127.0.0.1:3000"
-	}
-
-	var browser *rod.Browser
-	if browserOptions.Headless {
-		browser = rod.New().ControlURL(browserOptions.URL).MustConnect()
-	} else {
-		url := launcher.New().Headless(false).MustLaunch()
-		browser = rod.New().ControlURL(url).MustConnect()
-	}
 	return browser
 }

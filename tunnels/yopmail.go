@@ -34,17 +34,27 @@ func (v *YopmailTunnel) Init() error {
 	// Launch a new browser
 	v.browser = getBrowser(v.tunnelOptions.BrowserOptions)
 
+	pages := v.browser.MustPages()
+	for _, p := range pages {
+		if strings.Contains(p.MustHTML(), "https://yopmail.com/") {
+			v.page = p
+			break
+		}
+	}
+
 	// Create a new page
-	page := v.browser.MustPage("https://yopmail.com/")
-	v.page = page
+	if v.page == nil {
+		page := v.browser.MustPage("https://yopmail.com/")
+		v.page = page
+	}
 
 	// Wait for page to load
-	page.MustWaitLoad()
+	v.page.MustWaitLoad()
 
 	// If no email was provided, generate a random one
 	if v.tunnelOptions.Email == "" {
 		// Click on random email button
-		randomButton, err := page.Element("a.genrnd")
+		randomButton, err := v.page.Element("a.genrnd")
 		if err != nil {
 			return errors.New("failed to find random button")
 		}
@@ -52,7 +62,7 @@ func (v *YopmailTunnel) Init() error {
 		time.Sleep(time.Second)
 
 		// Get the generated email address
-		emailInput, err := page.Element("#login")
+		emailInput, err := v.page.Element("#login")
 		if err != nil {
 			return errors.New("failed to find email input")
 		}
@@ -60,7 +70,7 @@ func (v *YopmailTunnel) Init() error {
 		v.email = emailInput.MustProperty("value").String() + "@yopmail.com"
 	} else {
 		// Enter the provided email
-		emailInput, err := page.Element("#login")
+		emailInput, err := v.page.Element("#login")
 		if err != nil {
 			return errors.New("failed to find email input")
 		}
@@ -74,7 +84,7 @@ func (v *YopmailTunnel) Init() error {
 		emailInput.MustInput(username)
 
 		// Click the check button
-		checkButton, err := page.Element("button.material-icons-outlined.f36")
+		checkButton, err := v.page.Element("button.material-icons-outlined.f36")
 		if err != nil {
 			return errors.New("failed to find check button")
 		}
@@ -90,9 +100,30 @@ func (v *YopmailTunnel) Init() error {
 	return nil
 }
 
+// RenewEmail renews the email address
+func (v *YopmailTunnel) RenewEmail() error {
+	// Click on random email button
+	randomButton, err := v.page.Element("a.genrnd")
+	if err != nil {
+		return errors.New("failed to find random button")
+	}
+	randomButton.MustClick()
+	time.Sleep(time.Second)
+
+	// Get the generated email address
+	emailInput, err := v.page.Element("#login")
+	if err != nil {
+		return errors.New("failed to find email input")
+	}
+
+	v.email = emailInput.MustProperty("value").String() + "@yopmail.com"
+
+	return nil
+}
+
 // EmailAddress returns the current email address
-func (v *YopmailTunnel) EmailAddress() string {
-	return v.email
+func (v *YopmailTunnel) EmailAddress() (string, error) {
+	return v.email, nil
 }
 
 // SetCodeMatcher sets the matcher for the verification code

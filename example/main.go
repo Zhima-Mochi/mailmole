@@ -5,13 +5,23 @@ import (
 	"log"
 
 	"github.com/Zhima-Mochi/mailmole"
+	"github.com/go-rod/rod/lib/launcher"
 )
 
+func getWindowsURL() string {
+	launcher := launcher.New().Headless(false).Leakless(false)
+	url := launcher.MustLaunch()
+	return url
+}
+
 func main() {
+	url := getWindowsURL()
+	fmt.Println("URL:", url)
 	// Create a tunnel agent using the factory pattern
 	options := &mailmole.TunnelOptions{
 		BrowserOptions: &mailmole.BrowserOptions{
 			Headless: false,
+			URL:      url,
 		},
 	}
 
@@ -28,10 +38,13 @@ func main() {
 	}
 
 	// Ensure resources are cleaned up when done
-	defer agent.Close()
+	// defer agent.Close()
 
 	// Get the temporary email address
-	email := agent.EmailAddress()
+	email, err := agent.EmailAddress()
+	if err != nil {
+		log.Fatalf("Failed to get temporary email address: %v", err)
+	}
 	fmt.Println("Temporary email address:", email)
 
 	fmt.Println("Checking for verification email...")

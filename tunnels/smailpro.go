@@ -34,15 +34,29 @@ func (v *SmailProTunnel) Init() error {
 	// Launch a new browser
 	v.browser = getBrowser(v.tunnelOptions.BrowserOptions)
 
+	pages := v.browser.MustPages()
+	for _, p := range pages {
+		if strings.Contains(p.MustHTML(), "https://smailpro.com/") {
+			v.page = p
+			break
+		}
+	}
+
 	// Create a new page
-	page := v.browser.MustPage("https://smailpro.com/")
-	v.page = page
+	if v.page == nil {
+		page := v.browser.MustPage("https://smailpro.com/")
+		v.page = page
+	}
 
 	// Wait for page to load
-	page.MustWaitLoad()
+	v.page.MustWaitLoad()
 
+	return nil
+}
+
+func (v *SmailProTunnel) RenewEmail() error {
 	// Click create email button
-	createButton, err := page.Element(`button[title="Create temporary email"]`)
+	createButton, err := v.page.Element(`button[title="Create temporary email"]`)
 	if err != nil {
 		return errors.New("failed to find create email button")
 	}
@@ -50,30 +64,30 @@ func (v *SmailProTunnel) Init() error {
 	time.Sleep(time.Second)
 
 	// Click modal create button
-	modalCreateButton, err := page.ElementR("button", "Create")
+	modalCreateButton, err := v.page.ElementR("button", "Create")
 	if err != nil {
 		return errors.New("failed to find modal create button")
 	}
 	modalCreateButton.MustClick()
 	time.Sleep(2 * time.Second)
 
-	// Get the email address
-	emailElement, err := page.Element(`div[class="text-base sm:text-lg md:text-xl text-gray-700"]`)
-	if err != nil {
-		return errors.New("failed to find email element")
-	}
-
-	v.email = emailElement.MustText()
-	if !strings.Contains(v.email, "@") {
-		return errors.New("invalid email address")
-	}
-
 	return nil
 }
 
 // EmailAddress returns the current email address
-func (v *SmailProTunnel) EmailAddress() string {
-	return v.email
+func (v *SmailProTunnel) EmailAddress() (string, error) {
+	// Get the email address
+	emailElement, err := v.page.Element(`div[class="text-base sm:text-lg md:text-xl text-gray-700"]`)
+	if err != nil {
+		return "", errors.New("failed to find email element")
+	}
+
+	v.email = emailElement.MustText()
+	if !strings.Contains(v.email, "@") {
+		return "", errors.New("invalid email address")
+	}
+
+	return v.email, nil
 }
 
 // SetCodeExtractor sets a custom function to extract verification codes

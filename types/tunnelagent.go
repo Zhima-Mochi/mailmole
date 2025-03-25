@@ -19,8 +19,11 @@ type TunnelAgent interface {
 	// Init initializes the tunnel agent (login, open browser, generate email, etc.)
 	Init() error
 
+	// RenewEmail renews the email address
+	RenewEmail() error
+
 	// EmailAddress returns the current temporary email address
-	EmailAddress() string
+	EmailAddress() (string, error)
 
 	// GetVerificationCode parses and returns the verification code
 	// (e.g., 6-digit number)
