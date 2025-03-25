@@ -18,6 +18,19 @@ type SmailProTunnel struct {
 	tunnelOptions *types.TunnelOptions
 }
 
+// selectMainPage selects the main page
+func (v *SmailProTunnel) selectMainPage() error {
+	pages := v.browser.MustPages()
+	for _, p := range pages {
+		if strings.Contains(p.MustHTML(), "https://smailpro.com/") {
+			v.page = p
+			return nil
+		}
+	}
+
+	return errors.New("failed to find main page")
+}
+
 // NewSmailProTunnel creates a new SmailProTunnel
 func NewSmailProTunnel(options *types.TunnelOptions) types.TunnelAgent {
 	if options == nil {
@@ -55,6 +68,10 @@ func (v *SmailProTunnel) Init() error {
 }
 
 func (v *SmailProTunnel) RenewEmail() error {
+	if err := v.selectMainPage(); err != nil {
+		return err
+	}
+
 	// Click create email button
 	createButton, err := v.page.Element(`button[title="Create temporary email"]`)
 	if err != nil {
@@ -76,6 +93,10 @@ func (v *SmailProTunnel) RenewEmail() error {
 
 // EmailAddress returns the current email address
 func (v *SmailProTunnel) EmailAddress() (string, error) {
+	if err := v.selectMainPage(); err != nil {
+		return "", err
+	}
+
 	// Get the email address
 	emailElement, err := v.page.Element(`div[class="text-base sm:text-lg md:text-xl text-gray-700"]`)
 	if err != nil {
@@ -97,6 +118,10 @@ func (v *SmailProTunnel) SetCodeMatcher(selector string) {
 
 // GetVerificationCode extracts the verification code from the email
 func (v *SmailProTunnel) GetVerificationCode() (string, error) {
+	if err := v.selectMainPage(); err != nil {
+		return "", err
+	}
+
 	// Refresh inbox
 	if err := v.refreshInbox(); err != nil {
 		return "", err
@@ -138,6 +163,10 @@ func (v *SmailProTunnel) Close() error {
 
 // refreshInbox refreshes the inbox
 func (v *SmailProTunnel) refreshInbox() error {
+	if err := v.selectMainPage(); err != nil {
+		return err
+	}
+
 	// Refresh inbox
 	refreshButton, err := v.page.Element(`button[id="refresh"]`)
 	if err != nil {
