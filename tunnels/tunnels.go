@@ -3,6 +3,7 @@ package tunnels
 import (
 	"errors"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/Zhima-Mochi/mailmole/types"
@@ -18,6 +19,17 @@ var (
 		},
 	}
 )
+
+// selectMainPage selects the main page
+func selectMainPage(pages []*rod.Page) (*rod.Page, error) {
+	for _, p := range pages {
+		if strings.Contains(p.MustInfo().URL, "https://smailpro.com/") {
+			return p.MustActivate(), nil
+		}
+	}
+
+	return nil, errors.New("failed to find main page")
+}
 
 // Custom code extractor for different email formats
 func customCodeExtractor(page *rod.Page, matcher string) (string, error) {
